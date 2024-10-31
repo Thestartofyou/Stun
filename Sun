@@ -1,0 +1,45 @@
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+# URL of the site you want to scrape
+url = "https://example.com/jobs"
+
+# Send a GET request to fetch the webpage
+response = requests.get(url)
+soup = BeautifulSoup(response.content, "html.parser")
+
+# Lists to store scraped data
+job_titles = []
+companies = []
+locations = []
+links = []
+
+# Find elements based on HTML tags and class names (customize for each website)
+for job_card in soup.find_all("div", class_="job-card"):
+    # Extract job title
+    title = job_card.find("h2", class_="job-title").text
+    job_titles.append(title)
+    
+    # Extract company name
+    company = job_card.find("div", class_="company-name").text
+    companies.append(company)
+    
+    # Extract location
+    location = job_card.find("div", class_="location").text
+    locations.append(location)
+    
+    # Extract link to job posting
+    link = job_card.find("a", class_="apply-link")["href"]
+    links.append("https://example.com" + link)
+
+# Create a DataFrame and save it to a CSV file
+jobs_df = pd.DataFrame({
+    "Job Title": job_titles,
+    "Company": companies,
+    "Location": locations,
+    "Link": links
+})
+jobs_df.to_csv("job_listings.csv", index=False)
+
+print("Job listings saved to job_listings.csv")
